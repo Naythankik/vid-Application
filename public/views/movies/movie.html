@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VIDAPP</title>
+  </head>
+  <body>
+    <h2>The VidApp</h2>
+    <h3>Movie Upload</h3>
+    <form action="/vidapp/movies/" method="post">
+      <input type="text" name="title" id="title" placeholder="Movie Title..." />
+      <br /><br />
+
+      <input
+        type="text"
+        name="year"
+        id="year"
+        placeholder="Movie release year..."
+      /><br /><br />
+      <input
+        type="text"
+        name="director"
+        id="director"
+        placeholder="Movie Director..."
+      /><br /><br />
+      <input
+        type="text"
+        name="duration"
+        id="duration"
+        placeholder="Movie duration..."
+      /><br /><br />
+      <input
+        type="text"
+        name="genre"
+        id="genre"
+        placeholder="Movie Genre"
+      /><br /><br />
+      <input
+        type="text"
+        name="score"
+        id="score"
+        placeholder="Movie rating..."
+      /><br /><br />
+      <button type="submit">Upload Movie</button>
+    </form>
+  </body>
+</html>
