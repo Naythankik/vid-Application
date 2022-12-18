@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VIDAPP</title>
+  </head>
+  <body>
+    <h2>The VidApp</h2>
+    <h3>Rent a movie</h3>
+    <form action="/vidapp/rentals/" method="post">
+      <input
+        type="text"
+        name="userId"
+        id="userId"
+        placeholder="Enter user ID..."
+      /><br /><br />
+
+      <input
+        type="text"
+        name="movieId"
+        id="movieId"
+        placeholder="Enter Movie ID"
+      /><br /><br />
+
+      <input
+        type="text"
+        name="price"
+        id="price"
+        placeholder="Enter amount..."
+      /><br /><br />
+
+      <input type="date" name="rentDuration" id="rentDuration" /><br /><br />
+      <button type="submit">Rent Movie</button>
+    </form>
+  </body>
+</html>

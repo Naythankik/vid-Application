@@ -7,6 +7,7 @@ let movies = [
     duration: "2h 2min",
     genre: ["Romance", "Drama", "Comedy drama", "Comedy"],
     score: 8.4,
+    rentals: 13,
   },
   {
     id: 2,
@@ -16,6 +17,7 @@ let movies = [
     duration: "1h 28min",
     genre: ["Drama", "War"],
     score: 8.4,
+    rentals: 5,
   },
   {
     id: 3,
@@ -25,6 +27,7 @@ let movies = [
     duration: "2h 45min",
     genre: ["Drama", "Western"],
     score: 8.4,
+    rentals: 20,
   },
 ];
 
