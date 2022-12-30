@@ -21,6 +21,11 @@ const {
   postRental,
 } = require("../public/controllers/rentalsController");
 
+const {
+  getGenres,
+  postGenre,
+} = require("../public/controllers/genresController");
+
 const routers = express.Router();
 
 // The user controller routes
@@ -33,5 +38,8 @@ routers.route("/movie/:id").get(getMovie).put(updateMovie).delete(deleteMovie);
 
 //The rentals routes
 routers.route("/rentals").get(getRentals).post(postRental);
+
+// The Genres routes
+routers.route("/genres").get(getGenres).post(postGenre);
 
 module.exports = routers;

@@ -5,8 +5,7 @@ const path = require("path");
 const Joi = require("joi");
 
 const getRentals = (req, res) => {
-  //   res.status(200).send(rentals);
-  res.sendFile(path.join(__dirname, "../views/rentals/rental.html"));
+  res.status(200).send(rentals);
 };
 
 const postRental = (req, res) => {

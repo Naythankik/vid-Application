@@ -4,7 +4,6 @@ const Joi = require("joi");
 
 const getMovies = (req, res) => {
   res.status(200).send(movies);
-  //   res.sendFile(path.join(__dirname, "../views/movies/movie.html"));
 };
 
 const postMovies = (req, res) => {

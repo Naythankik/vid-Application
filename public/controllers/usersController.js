@@ -19,7 +19,7 @@ function validation(param) {
 }
 
 function getUsers(req, res) {
-  res.sendFile(path.join(__dirname, "../views/users/index.html"));
+  res.status(200).send(users);
 }
 
 const postUser = (req, res) => {
