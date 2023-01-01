@@ -19,6 +19,7 @@ const {
 const {
   getRentals,
   postRental,
+  findRental,
 } = require("../public/controllers/rentalsController");
 
 const {
@@ -38,6 +39,7 @@ routers.route("/movie/:id").get(getMovie).put(updateMovie).delete(deleteMovie);
 
 //The rentals routes
 routers.route("/rentals").get(getRentals).post(postRental);
+routers.route("/rental/:id").get(findRental).post(postRental);
 
 // The Genres routes
 routers.route("/genres").get(getGenres).post(postGenre);

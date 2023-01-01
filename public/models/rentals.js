@@ -24,6 +24,12 @@ const rentals = [
     movieId: 4,
     rentDuration: `${date.getDay()} ${date.getMonth()} ${date.getFullYear()}`,
   },
+  {
+    userId: 1,
+    price: "$289",
+    movieId: 4,
+    rentDuration: `${date.getDay()} ${date.getMonth()} ${date.getFullYear()}`,
+  },
 ];
 
 module.exports = rentals;
