@@ -18,9 +18,9 @@ function validation(param) {
   }
 }
 
-function getUsers(req, res) {
+const getUsers = (req, res) => {
   res.status(200).send(users);
-}
+};
 
 const postUser = (req, res) => {
   if (validation(req.body)) {

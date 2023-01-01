@@ -1,5 +1,4 @@
 const movies = require("../models/movies");
-const path = require("path");
 const Joi = require("joi");
 
 const getMovies = (req, res) => {
@@ -12,8 +11,9 @@ const postMovies = (req, res) => {
     year: Joi.number().integer().required(),
     director: Joi.string().min(5).required(),
     duration: Joi.string().required(),
-    genre: Joi.array().min(2).required,
+    genre: Joi.array().min(2).required(),
     score: Joi.number(),
+    rentals: Joi.number().required(),
   });
 
   const movErr = movie.validate(req.body);
@@ -45,15 +45,17 @@ const updateMovie = (req, res) => {
       warning: `The user with the id, ${req.params.id} is not found`,
     });
   } else {
-    (upMovie.title = req.body.title || upMovie.title),
-      (upMovie.year = req.body.year || upMovie.year),
-      (upMovie.director = req.body.director || upMovie.director),
-      (upMovie.duration = req.body.duration || upMovie.duration),
-      (upMovie.genre = req.body.genre || upMovie.genre),
-      (upMovie.score = req.body.score || upMovie.score),
-      res.status(200).send({
-        message: `The movie with id ${req.params.id} has been updated!`,
-      });
+    upMovie.title = req.body.title || upMovie.title;
+    upMovie.year = req.body.year || upMovie.year;
+    upMovie.director = req.body.director || upMovie.director;
+    upMovie.duration = req.body.duration || upMovie.duration;
+    upMovie.genre = req.body.genre || upMovie.genre;
+    upMovie.score = req.body.score || upMovie.score;
+    upMovie.rentals = req.body.rentals || upMovie.rentals;
+
+    res.status(200).send({
+      message: `The movie with id ${req.params.id} has been updated!`,
+    });
   }
 };
 

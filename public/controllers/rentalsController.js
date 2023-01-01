@@ -1,7 +1,6 @@
 const rentals = require("../models/rentals");
 const users = require("../models/users");
 const movies = require("../models/movies");
-const path = require("path");
 const Joi = require("joi");
 
 const getRentals = (req, res) => {
@@ -13,7 +12,7 @@ const postRental = (req, res) => {
     userId: Joi.number().max(users.length).required(),
     price: Joi.number().required(),
     movieId: Joi.number().max(movies.length).required(),
-    rentDuration: Joi.date().greater("now").required(),
+    rentDuration: Joi.required(),
   });
 
   const err = schema.validate(req.body);
@@ -22,6 +21,7 @@ const postRental = (req, res) => {
     return;
   }
   req.body.price = "$" + req.body.price;
+
   rentals.push(req.body);
   res.status(200).send(rentals);
 };
