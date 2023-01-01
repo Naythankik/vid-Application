@@ -7,7 +7,7 @@ let movies = [
     duration: "2h 2min",
     genre: ["Romance", "Drama", "Comedy drama", "Comedy"],
     score: 8.4,
-    rentals: 13,
+    rentals: 1,
   },
   {
     id: 2,

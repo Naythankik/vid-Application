@@ -20,13 +20,41 @@ const postRental = (req, res) => {
     res.status(401).send(err.error.details[0].message);
     return;
   }
+
+  //Find the movie with the id provided
+  const movie = movies.find((val) => val.id === parseInt(req.body.movieId));
+
+  //if the rentals is < 1
+  if (movie.rentals < 1) {
+    res.status(403).send({ message: "The movie has reached max. rent limit" });
+    return;
+  }
+
+  //and reduce the number of rentals
+  movie.rentals -= 1;
   req.body.price = "$" + req.body.price;
 
   rentals.push(req.body);
-  res.status(200).send(rentals);
+  res.status(200).send({ message: "Movie has been rented successfully!" });
+};
+
+const findRental = (req, res) => {
+  const rental = rentals.filter(
+    (rent) => rent.userId == parseInt(req.params.id)
+  );
+
+  //   If the value < 1, return error message to the user
+  if (rental.length < 1) {
+    return res.status(400).send({
+      message: `The rental with id of ${req.params.id} not seen, try again.`,
+    });
+  }
+
+  res.status(200).send(rental);
 };
 
 module.exports = {
   getRentals,
   postRental,
+  findRental,
 };
