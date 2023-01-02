@@ -37,6 +37,4 @@ const genres = [
   },
 ];
 
-module.exports = {
-  genres,
-};
+module.exports = genres;

@@ -2,6 +2,7 @@ const rentals = require("../models/rentals");
 const users = require("../models/users");
 const movies = require("../models/movies");
 const Joi = require("joi");
+const { date } = require("joi");
 
 const getRentals = (req, res) => {
   res.status(200).send(rentals);
@@ -12,7 +13,6 @@ const postRental = (req, res) => {
     userId: Joi.number().max(users.length).required(),
     price: Joi.number().required(),
     movieId: Joi.number().max(movies.length).required(),
-    rentDuration: Joi.required(),
   });
 
   const err = schema.validate(req.body);
@@ -32,6 +32,7 @@ const postRental = (req, res) => {
 
   //and reduce the number of rentals
   movie.rentals -= 1;
+  req.body.id = rentals.length + 1;
   req.body.price = "$" + req.body.price;
 
   rentals.push(req.body);
@@ -46,15 +47,34 @@ const findRental = (req, res) => {
   //   If the value < 1, return error message to the user
   if (rental.length < 1) {
     return res.status(400).send({
-      message: `The rental with id of ${req.params.id} not seen, try again.`,
+      message: `The rent(s) with user id of ${req.params.id} not seen, try again.`,
     });
   }
 
   res.status(200).send(rental);
 };
 
+const delRental = (req, res) => {
+  const rent = rentals.findIndex((ren) => ren.id === parseInt(req.params.id));
+
+  //if the rent is not found return an error message to the user
+  if (rent == -1) {
+    res
+      .status(402)
+      .send({ error: `The rent with id, ${req.params.id} does not exist` });
+  }
+
+  //Delete the rent from the hardcored database
+  rentals.splice(rent, 1);
+
+  res.send({
+    message: `Rentage with id of ${req.params.id} has been deleted successfully!`,
+  });
+};
+
 module.exports = {
   getRentals,
   postRental,
   findRental,
+  delRental,
 };

@@ -75,10 +75,53 @@ const deleteMovie = (req, res) => {
     });
   }
 };
+
+const getMoviesByName = (req, res) => {
+  const schema = Joi.object({
+    title: Joi.string(),
+  });
+  const check = schema.validate(req.query);
+  if (check.error) {
+    res.status(403).send({ charError: check.error.details[0].message });
+  }
+  const films = movies.filter((film) => film.title.includes(req.query.title));
+
+  if (!films.length > 0) {
+    res.status(401).send({
+      error: `The movie with title, ${req.query.title} not found, Try another search`,
+    });
+  }
+  res.status(200).send(films);
+};
+
+const getMovieByYear = (req, res) => {
+  const year = movies.filter(
+    (movie) => parseInt(req.query.year) === movie.year
+  );
+
+  if (year.length < 1) {
+    res.status(401).send({ error: "No movie for that speciifed year" });
+  }
+  res.status(200).send(year);
+};
+
+const getMovieByRatings = (req, res) => {
+  const ratings = movies.filter(
+    (movie) => movie.score >= parseInt(req.query.ratings)
+  );
+
+  !ratings.length > 0
+    ? res.send({ error: "No movie with the ratings" })
+    : res.status(200).send(ratings);
+};
+
 module.exports = {
   getMovies,
   postMovies,
   getMovie,
   updateMovie,
   deleteMovie,
+  getMoviesByName,
+  getMovieByYear,
+  getMovieByRatings,
 };

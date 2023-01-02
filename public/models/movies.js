@@ -16,7 +16,7 @@ let movies = [
     director: "Stanley Kubrick",
     duration: "1h 28min",
     genre: ["Drama", "War"],
-    score: 8.4,
+    score: 9.4,
     rentals: 5,
   },
   {
@@ -26,7 +26,7 @@ let movies = [
     director: "Quentin Tarantino",
     duration: "2h 45min",
     genre: ["Drama", "Western"],
-    score: 8.4,
+    score: 5,
     rentals: 20,
   },
 ];
