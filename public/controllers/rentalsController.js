@@ -2,41 +2,51 @@ const rentals = require("../models/rentals");
 const users = require("../models/users");
 const movies = require("../models/movies");
 const Joi = require("joi");
-const { date } = require("joi");
+const date = new Date();
 
 const getRentals = (req, res) => {
   res.status(200).send(rentals);
+  return;
 };
 
 const postRental = (req, res) => {
+  let month = date.getMonth() + 1;
+
   const schema = Joi.object({
     userId: Joi.number().max(users.length).required(),
     price: Joi.number().required(),
     movieId: Joi.number().max(movies.length).required(),
+    rentDuration: Joi.date()
+      .less(`${date.getDay()}/${month}/${date.getFullYear()}`)
+      .required(),
   });
 
-  const err = schema.validate(req.body);
-  if (err.error) {
-    res.status(401).send(err.error.details[0].message);
+  //validate the input by the user
+  const { error, value } = schema.validate(req.body);
+  if (error) {
+    res.status(403).send(error.details[0].message);
     return;
   }
 
   //Find the movie with the id provided
-  const movie = movies.find((val) => val.id === parseInt(req.body.movieId));
+  const movie = movies.find((val) => val.id === parseInt(value.movieId));
 
-  //if the rentals is < 1
+  //if the rentals is less than 1
   if (movie.rentals < 1) {
-    res.status(403).send({ message: "The movie has reached max. rent limit" });
+    res
+      .status(403)
+      .send({ message: "The movie has reached maximum rent limit" });
     return;
   }
 
   //and reduce the number of rentals
   movie.rentals -= 1;
-  req.body.id = rentals.length + 1;
-  req.body.price = "$" + req.body.price;
+  value.id = rentals.length + 1;
+  value.price = "$" + value.price;
 
-  rentals.push(req.body);
+  rentals.push(value);
   res.status(200).send({ message: "Movie has been rented successfully!" });
+  return;
 };
 
 const findRental = (req, res) => {
@@ -46,12 +56,14 @@ const findRental = (req, res) => {
 
   //   If the value < 1, return error message to the user
   if (rental.length < 1) {
-    return res.status(400).send({
+    res.status(403).send({
       message: `The rent(s) with user id of ${req.params.id} not seen, try again.`,
     });
+    return;
   }
 
   res.status(200).send(rental);
+  return;
 };
 
 const delRental = (req, res) => {
@@ -61,7 +73,8 @@ const delRental = (req, res) => {
   if (rent == -1) {
     res
       .status(402)
-      .send({ error: `The rent with id, ${req.params.id} does not exist` });
+      .send({ error: `The rent with id, ${req.params.id}, does not exist` });
+    return;
   }
 
   //Delete the rent from the hardcored database
@@ -70,6 +83,7 @@ const delRental = (req, res) => {
   res.send({
     message: `Rentage with id of ${req.params.id} has been deleted successfully!`,
   });
+  return;
 };
 
 module.exports = {

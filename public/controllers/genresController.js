@@ -11,14 +11,15 @@ const postGenre = (req, res) => {
     name: Joi.string().required(),
   });
 
-  const err = scheme.validate(req.body);
+  const { error, value } = scheme.validate(req.body);
 
-  if (err.error) {
-    res.status(400).send({ error: err.error.details[0].message });
+  if (error) {
+    res.status(400).send({ error: error.details[0].message });
+    return;
   }
 
   req.body.id = genres.length + 1;
-  genres.push(req.body);
+  genres.push(value);
 
   res.send({ message: "The genre has been posted successfully!" });
 };
