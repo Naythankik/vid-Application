@@ -40,9 +40,9 @@ routers.route("/user/:id").get(findUser).put(updateUser).delete(deleteUser);
 
 // The movies routes
 routers.route("/movies").get(getMovies).post(postMovies);
+routers.route("/movies/ratings").get(getMovieByRatings);
 routers.route("/movies/year").get(getMovieByYear);
 routers.route("/movies/name").get(getMoviesByName);
-routers.route("/movies/ratings").get(getMovieByRatings);
 routers.route("/movie/:id").get(getMovie).put(updateMovie).delete(deleteMovie);
 
 //The rentals routes
