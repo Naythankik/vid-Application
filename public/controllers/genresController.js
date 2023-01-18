@@ -4,24 +4,26 @@ const Joi = require("joi");
 
 const getGenres = (req, res) => {
   res.status(200).send(genres);
+  return;
 };
 
 const postGenre = (req, res) => {
-  const scheme = Joi.object({
+  const schema = Joi.object({
     name: Joi.string().required(),
   });
 
-  const { error, value } = scheme.validate(req.body);
+  const { error, value } = schema.validate(req.body);
 
   if (error) {
     res.status(400).send({ error: error.details[0].message });
     return;
   }
 
-  req.body.id = genres.length + 1;
+  value.id = genres.length + 1;
   genres.push(value);
 
   res.send({ message: "The genre has been posted successfully!" });
+  return;
 };
 
 const findMovieByGenre = (req, res) => {
@@ -32,7 +34,9 @@ const findMovieByGenre = (req, res) => {
   );
 
   movie.length < 1
-    ? res.status(403).send({ meesgae: "No movie for the genre" })
+    ? res
+        .status(404)
+        .send({ meesgae: `No movie for the genre,${req.params.genre}` })
     : res.send(movie);
 };
 
