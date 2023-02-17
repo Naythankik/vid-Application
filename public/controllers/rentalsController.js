@@ -49,8 +49,8 @@ const postRental = (req, res) => {
   return;
 };
 
-const findRental = (req, res) => {
-  const rental = rentals.filter(
+const findRental = async (req, res) => {
+  const rental = await rentals.filter(
     (rent) => rent.userId == parseInt(req.params.id)
   );
 

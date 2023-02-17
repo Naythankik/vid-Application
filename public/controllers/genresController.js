@@ -26,8 +26,8 @@ const postGenre = (req, res) => {
   return;
 };
 
-const findMovieByGenre = (req, res) => {
-  const movie = movies.filter((MovieGenre) =>
+const findMovieByGenre = async (req, res) => {
+  const movie = await movies.filter((MovieGenre) =>
     MovieGenre.genre.includes(
       req.params.genre[0].toUpperCase() + req.params.genre.slice(1)
     )
