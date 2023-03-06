@@ -2,13 +2,15 @@ const express = require("express");
 require("dotenv").config();
 const PORT = process.env.PORT || 2000;
 const vidApp = require("./route/routes");
+const connection = require("./config/dbConnection");
+connection();
 
 const app = express();
 
 // The middlewares of the App
 app.use(express.json());
 
-app.use("/vidapp", vidApp);
+app.use("/api/vidapp", vidApp);
 
 app.get(["/", "/vidapp"], (req, res) => res.send("Welcome to VIDAPP!"));
 

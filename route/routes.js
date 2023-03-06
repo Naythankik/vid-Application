@@ -4,9 +4,11 @@ const {
   getUsers,
   postUser,
   findUser,
+  login,
   updateUser,
   deleteUser,
-} = require("../public/controllers/usersController");
+  logout,
+} = require("../app/controllers/usersController");
 
 const {
   getMovies,
@@ -17,39 +19,52 @@ const {
   getMoviesByName,
   getMovieByYear,
   getMovieByRatings,
-} = require("../public/controllers/moviesController");
+} = require("../app/controllers/moviesController");
 
 const {
   getRentals,
   postRental,
   findRental,
   delRental,
-} = require("../public/controllers/rentalsController");
+} = require("../app/controllers/rentalsController");
 
 const {
   getGenres,
   postGenre,
   findMovieByGenre,
-} = require("../public/controllers/genresController");
+} = require("../app/controllers/genresController");
+
+const authentication = require("../app/middleware/authentication");
 
 const routers = express.Router();
 
-// The user controller routes
 routers.route("/users").get(getUsers).post(postUser);
-routers.route("/user/:id").get(findUser).put(updateUser).delete(deleteUser);
+routers.route("/user/genres").get(getGenres).post(postGenre);
+routers.route("/user/movies").get(getMovies).post(postMovies);
+routers.route("/user/rentals").get(getRentals).post(postRental);
+routers
+  .route("/user/movie/:uuid")
+  .get(getMovie)
+  .put(updateMovie)
+  .delete(deleteMovie);
+
+routers.route("/user/movies/ratings").get(getMovieByRatings);
+routers.route("/user/movies/year").get(getMovieByYear);
+routers.route("/user/movies/name").get(getMoviesByName);
+
+// routes with parameters
+routers
+  .route("/user/:id")
+  .get(findUser)
+  .put(authentication, updateUser)
+  .delete(authentication, deleteUser);
+routers.post("/login", login).post("/logout", logout);
 
 // The movies routes
-routers.route("/movies").get(getMovies).post(postMovies);
-routers.route("/movies/ratings").get(getMovieByRatings);
-routers.route("/movies/year").get(getMovieByYear);
-routers.route("/movies/name").get(getMoviesByName);
-routers.route("/movie/:id").get(getMovie).put(updateMovie).delete(deleteMovie);
 
 //The rentals routes
-routers.route("/rentals").get(getRentals).post(postRental);
-routers.route("/rental/:id").get(findRental).post(postRental).delete(delRental);
+routers.route("/user/rental/:uuid").get(findRental).delete(delRental);
 
 // The Genres routes
-routers.route("/genres").get(getGenres).post(postGenre);
-routers.route("/genres/:genre").get(findMovieByGenre);
+routers.route("/user/genres/:genre").get(findMovieByGenre);
 module.exports = routers;
