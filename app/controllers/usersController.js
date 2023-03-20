@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const { userValidation } = require("../middleware/validation");
 const token = require("../middleware/token");
 const generateToken = require("../middleware/token");
+const mail = require("./emailController");
 
 //For admin alone
 const getUsers = async (req, res) => {
@@ -14,6 +15,12 @@ const getUsers = async (req, res) => {
 
 const postUser = async (req, res) => {
   let { error, value } = userValidation(req.body);
+  const data = {
+    to: value.email,
+    text: `Account has been created successfully`,
+    subject: "Account Created",
+    html: `Click to login: <a href="localhost:${process.env.PORT}/api/vidapp/login">Login</a>`,
+  };
 
   if (error) {
     res.status(403).send(error.details[0].message);
@@ -28,7 +35,13 @@ const postUser = async (req, res) => {
           expiresIn: "2h",
         }
       );
-      await User.findOneAndUpdate({ uuid: user.uuid }, { token: token });
+      const createdUser = await User.findOneAndUpdate(
+        { uuid: user.uuid },
+        { token: token }
+      );
+      if (createdUser) {
+        mail(data);
+      }
       res.status(200).send("The user has been registered successfully!");
     } catch (err) {
       throw new Error(err);
