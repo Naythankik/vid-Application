@@ -8,6 +8,7 @@ function userValidation(param) {
     telephone: Joi.number().min(11).required(),
     address: Joi.string().min(3).required(),
     password: Joi.string().required(),
+    role: Joi.string().valid("user", "admin"),
   });
 
   return schema.validate(param);

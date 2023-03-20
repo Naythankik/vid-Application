@@ -34,11 +34,17 @@ const {
   findMovieByGenre,
 } = require("../app/controllers/genresController");
 
-const authentication = require("../app/middleware/authentication");
+const {
+  authentication,
+  authorization,
+} = require("../app/middleware/authentication");
 
 const routers = express.Router();
 
-routers.route("/users").get(getUsers).post(postUser);
+routers
+  .route("/users")
+  .get(authentication, authorization, getUsers)
+  .post(postUser);
 routers.route("/user/genres").get(getGenres).post(postGenre);
 routers.route("/user/movies").get(getMovies).post(postMovies);
 routers.route("/user/rentals").get(getRentals).post(postRental);

@@ -1,17 +1,27 @@
+const jwt = require("jsonwebtoken");
 const User = require("../models/users");
 
 const authentication = async (req, res, next) => {
-  try {
-    const user = await User.findById({ _id: req.params.id });
-
-    // check if the user is active
-    return !user.isActive
-      ? res.status(403).send({ message: "User is not logged in" })
-      : next();
-  } catch (err) {
-    // error if the id is not defined
-    throw new Error(err);
+  const token =
+    req.body.token ||
+    req.query.token ||
+    req.headers.authorization.split(" ")[1];
+  if (!token) {
+    res.status(403).send({ message: "A token is required for authentication" });
+  } else {
+    try {
+      const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+      req.user = decoded;
+    } catch (err) {
+      throw new Error(err);
+    }
+    return next();
   }
 };
 
-module.exports = authentication;
+const authorization = (req, res, next) => {
+  const admin = req.user;
+  console.log(admin);
+};
+
+module.exports = { authentication, authorization };

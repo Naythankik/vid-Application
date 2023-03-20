@@ -1,7 +1,11 @@
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { userValidation } = require("../middleware/validation");
+const token = require("../middleware/token");
+const generateToken = require("../middleware/token");
 
+//For admin alone
 const getUsers = async (req, res) => {
   const findUser = await User.find();
   res.status(200).send(findUser);
@@ -16,24 +20,47 @@ const postUser = async (req, res) => {
     return;
   } else {
     try {
-      await User.create(value);
+      const user = await User.create(value);
+      const token = jwt.sign(
+        { user: user.uuid, email: user.email },
+        process.env.TOKEN_KEY,
+        {
+          expiresIn: "2h",
+        }
+      );
+      await User.findOneAndUpdate({ uuid: user.uuid }, { token: token });
       res.status(200).send("The user has been registered successfully!");
     } catch (err) {
-      res.status(400).send(err.keyValue);
+      throw new Error(err);
     }
     return;
   }
 };
 
 const login = async (req, res) => {
+  const { email } = req.body;
+
+  //check if email is empty
+  if (!email) throw new Error("No data submitted");
+
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email });
+
     if (!user) {
       res.status(403).send({ message: "User not found" });
     } else {
       if (bcrypt.compareSync(req.body.password, user.password)) {
-        await User.updateOne({ _id: user.id }, { isActive: true });
-        res.status(200).send({ message: "User is active" });
+        const token = generateToken(user.id);
+
+        await user.update({ isActive: true, token: token });
+
+        //cookie is created so as to logout the user when the endpoint is accessed
+        res.cookie("token", token, {
+          httpOnly: true,
+          maxAge: 86400,
+        });
+
+        res.status(200).send({ message: "User is Active" });
       } else {
         res.status(403).send({ message: "User password is wrong" });
       }
@@ -45,12 +72,25 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
+  const cookie = req.cookies;
+
+  //check if the cookie exist
+  if (!cookie.token) throw new Error("No token found");
+
+  const token = cookie.token;
+
   try {
-    const user = await User.findOne({ email: req.body.email });
-    if (user.isActive) {
-      await User.updateOne({ _id: user.id }, { isActive: false });
-      res.status(200).send({ message: "User has been logout successfully" });
+    const user = await User.findOne({ token });
+    if (!user) {
+      return res.status(204).send({ message: "Login" });
     }
+
+    await User.findByIdAndUpdate(user.id, {
+      token: "",
+      isActive: false,
+    });
+    res.clearCookie("token", { httpOnly: true, secure: true });
+    res.status(200).send({ message: "User has been logout successfully" });
   } catch (err) {
     res.status(403).send({ error: err.message });
   }

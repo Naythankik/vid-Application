@@ -1,8 +1,13 @@
 const { default: mongoose } = require("mongoose");
+const uuid = require("uuid");
 const bcrypt = require("bcrypt");
 
 const user = new mongoose.Schema(
   {
+    uuid: {
+      type: String,
+      default: uuid.v1,
+    },
     firstName: {
       type: String,
       required: true,
@@ -20,9 +25,17 @@ const user = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
+    },
     address: {
       type: String,
       required: true,
+    },
+    token: {
+      type: String,
     },
     isActive: {
       type: Boolean,
