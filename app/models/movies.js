@@ -26,6 +26,7 @@ const movie = new mongoose.Schema(
       required: true,
     },
     ratings: Number,
+    price: Number,
     rentals: {
       type: Number,
       default: 10,

@@ -1,14 +1,38 @@
 const Movies = require("../models/movies");
-const Joi = require("joi");
 const { movieValidation } = require("../middleware/validation");
+const Rent = require("../models/rentals");
 
 const getMovies = async (req, res) => {
-  try {
-    const movies = await Movies.find().select(["-_id"]);
-    res.status(200).send(movies);
-  } catch (error) {
-    throw new Error(error);
+  const query = {};
+
+  //select movie by ratings
+  if (req.query.ratings) {
+    query.ratings = { $gte: req.query.ratings };
   }
+
+  //select movie by year
+  if (req.query.year) {
+    query.year = { $gte: req.query.year };
+  }
+
+  //select by name
+  if (req.query.name) {
+    query.title = req.query.name;
+  }
+
+  //select by genre
+  if (req.query.genre) {
+    query.genre = { $in: req.query.genre };
+  }
+
+  const movie = await Movies.find(query).select(["-_id"]);
+
+  if (movie.length === 0) {
+    res.status(404).send({ error: "Nothing found!" });
+    return;
+  }
+
+  res.send(movie);
 };
 
 const postMovies = async (req, res) => {
@@ -37,6 +61,84 @@ const getMovie = async (req, res) => {
           warning: `The movie with the id, ${req.params.id} is not found`,
         })
       : res.status(200).send(movie);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const rentMovie = async (req, res) => {
+  const { uuid } = req.params;
+  try {
+    const movie = await Movies.findOne({ uuid });
+
+    if (!movie) {
+      return res.status(404).send({ message: "Movie not found" });
+    } else {
+      const rentExist = await Rent.findOne({
+        user: req.user.id,
+        movie: movie.id,
+      });
+
+      if (rentExist) {
+        throw new Error("Movie has been rented already");
+      } else {
+        const rent = await Rent.create({
+          user: req.user.id,
+          movie: movie.id,
+        });
+        res.status(200).send({ message: "Movie, rented successfully" });
+        return;
+      }
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const viewRent = async (req, res) => {
+  const { uuid } = req.params;
+
+  //find movie
+  try {
+    const movie = await Movies.findOne({ uuid });
+
+    if (!movie) throw new Error("Movie does not exist");
+
+    try {
+      const rent = await Rent.findOne({
+        movie: movie.id,
+        user: req.user.id,
+      })
+        .populate(["movie"])
+        .select(["movie", "-_id"]);
+
+      res.status(200).send(rent);
+    } catch (error) {
+      throw new Error(error);
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const deleteRent = async (req, res) => {
+  const { uuid } = req.params;
+
+  //find movie
+  try {
+    const movie = await Movies.findOne({ uuid });
+
+    if (!movie) throw new Error("Movie does not exist");
+
+    try {
+      await Rent.findOneAndDelete({
+        movie: movie.id,
+        user: req.user.id,
+      });
+
+      res.status(200).send({ message: "Rent has been deleted" });
+    } catch (error) {
+      throw new Error(error);
+    }
   } catch (error) {
     throw new Error(error);
   }
@@ -84,63 +186,13 @@ const deleteMovie = async (req, res) => {
   }
 };
 
-const getMoviesByName = async (req, res) => {
-  const schema = Joi.object({
-    title: Joi.string(),
-  });
-
-  const { error, value } = schema.validate(req.query);
-  if (error) {
-    res.status(403).send({ error: error.details[0].message });
-    return;
-  }
-
-  try {
-    const film = await Movies.findOne(value).select(["-_id"]);
-
-    if (!film) {
-      res.status(404).send({
-        error: `The movie with title, ${value.title}, not found, Try another search`,
-      });
-      return;
-    }
-    res.status(200).send(film);
-    return;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const getMovieByYear = async (req, res) => {
-  const year = await Movies.find({ year: { $gte: req.query.year } }).select([
-    "-_id",
-  ]);
-
-  if (year.length < 1) {
-    res.status(404).send({ error: "No movie for that speciifed year" });
-    return;
-  }
-  res.status(200).send(year);
-  return;
-};
-
-const getMovieByRatings = async (req, res) => {
-  const ratings = await Movies.find({
-    ratings: { $gte: req.query.ratings },
-  }).select(["-_id"]);
-
-  return !ratings.length > 0
-    ? res.send({ error: "No movie(s) with the rating" })
-    : res.status(200).send(ratings);
-};
-
 module.exports = {
   getMovies,
   postMovies,
   getMovie,
   updateMovie,
   deleteMovie,
-  getMoviesByName,
-  getMovieByYear,
-  getMovieByRatings,
+  rentMovie,
+  viewRent,
+  deleteRent,
 };

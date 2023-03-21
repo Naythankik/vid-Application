@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+const { default: mongoose, mongo } = require("mongoose");
 const uuid = require("uuid");
 const rentals = new mongoose.Schema(
   {
@@ -6,16 +6,14 @@ const rentals = new mongoose.Schema(
       type: String,
       default: uuid.v1,
     },
-    userId: {
-      type: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
-    price: {
-      type: String,
-      required: true,
-    },
-    movieUuid: {
-      type: String,
+    movie: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Movies",
       required: true,
     },
   },

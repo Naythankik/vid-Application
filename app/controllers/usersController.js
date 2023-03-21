@@ -8,12 +8,16 @@ const mail = require("./emailController");
 
 //For admin alone
 const getUsers = async (req, res) => {
-  const findUser = await User.find();
-  res.status(200).send(findUser);
-  return;
+  try {
+    const findUser = await User.find().select(["-_id"]);
+    res.status(200).send(findUser);
+    return;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
-const postUser = async (req, res) => {
+const createUser = async (req, res) => {
   let { error, value } = userValidation(req.body);
   const data = {
     to: value.email,
@@ -42,7 +46,11 @@ const postUser = async (req, res) => {
       if (createdUser) {
         mail(data);
       }
-      res.status(200).send("The user has been registered successfully!");
+      res
+        .status(201)
+        .send(
+          "The user has been created successfully! \n check your mail inbox for Account verification"
+        );
     } catch (err) {
       throw new Error(err);
     }
@@ -64,8 +72,11 @@ const login = async (req, res) => {
     } else {
       if (bcrypt.compareSync(req.body.password, user.password)) {
         const token = generateToken(user.id);
+        const { id } = user;
 
-        await user.update({ isActive: true, token: token });
+        await User.findByIdAndUpdate(id, {
+          $set: { isActive: true, token: token },
+        });
 
         //cookie is created so as to logout the user when the endpoint is accessed
         res.cookie("token", token, {
@@ -73,7 +84,7 @@ const login = async (req, res) => {
           maxAge: 86400,
         });
 
-        res.status(200).send({ message: "User is Active" });
+        res.status(200).send({ message: token });
       } else {
         res.status(403).send({ message: "User password is wrong" });
       }
@@ -155,7 +166,7 @@ const deleteUser = async (req, res) => {
 };
 module.exports = {
   getUsers,
-  postUser,
+  createUser,
   findUser,
   updateUser,
   deleteUser,

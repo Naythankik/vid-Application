@@ -3,8 +3,7 @@ const Genre = require("../models/genres");
 const Joi = require("joi");
 
 const getGenres = async (req, res) => {
-  const genres = await Genre.find();
-  console.log(genres);
+  const genres = await Genre.find().select(["-_id", "-__v"]);
   res.status(200).send(genres);
   return;
 };
@@ -26,22 +25,7 @@ const postGenre = async (req, res) => {
     : res.status(403).send({ message: "Genre was not posted successfully!" });
 };
 
-const findMovieByGenre = async (req, res) => {
-  try {
-    const movie = await Movies.find({ genre: req.params.genre });
-
-    return movie.length < 1
-      ? res
-          .status(404)
-          .send({ meesgae: `No movie for the genre,${req.params.genre}` })
-      : res.send(movie);
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-
 module.exports = {
   getGenres,
   postGenre,
-  findMovieByGenre,
 };

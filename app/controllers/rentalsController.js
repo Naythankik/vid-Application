@@ -67,48 +67,7 @@ const postRental = async (req, res) => {
   }
 };
 
-const findRental = async (req, res) => {
-  const rental = await Rentals.find({ userId: req.params.uuid }).select([
-    "-_id",
-  ]);
-
-  //   If the value < 1, return error message to the user
-  if (rental.length < 1) {
-    res.status(403).send({
-      message: `The rent(s) with user id of ${req.params.uuid} not seen, try again.`,
-    });
-    return;
-  }
-
-  res.status(200).send(rental);
-  return;
-};
-
-const delRental = async (req, res) => {
-  const rent = await Rentals.findOneAndDelete({ uuid: req.params.uuid });
-
-  //if the rent is not found return an error message to the user
-  if (!rent) {
-    res
-      .status(402)
-      .send({ error: `The rent with id, ${req.params.uuid}, does not exist` });
-    return;
-  }
-
-  const movie = await Movies.findOne({ uuid: rent.movieUuid });
-  await Movies.findOneAndUpdate(
-    { uuid: rent.movieUuid },
-    { rentals: movie.rentals + 1 }
-  );
-  res.send({
-    message: `Rentage with id of ${req.params.uuid} has been deleted successfully!`,
-  });
-  return;
-};
-
 module.exports = {
   getRentals,
   postRental,
-  findRental,
-  delRental,
 };
