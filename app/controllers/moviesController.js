@@ -1,6 +1,7 @@
 const Movies = require("../models/movies");
 const { movieValidation } = require("../middleware/validation");
 const Rent = require("../models/rentals");
+const url = require("url");
 
 const getMovies = async (req, res) => {
   const query = {};
@@ -87,10 +88,11 @@ const rentMovie = async (req, res) => {
       if (rentExist) {
         throw new Error("Movie has been rented already");
       } else {
-        const rent = await Rent.create({
+        await Rent.create({
           user: req.user.id,
           movie: movie.id,
         });
+
         res.status(200).send({ message: "Movie, rented successfully" });
         return;
       }

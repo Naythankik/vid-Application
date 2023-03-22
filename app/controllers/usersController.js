@@ -2,7 +2,6 @@ const User = require("../models/users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { userValidation } = require("../middleware/validation");
-const token = require("../middleware/token");
 const generateToken = require("../middleware/token");
 const mail = require("./emailController");
 

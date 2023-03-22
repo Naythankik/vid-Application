@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 app.use("/api/vidapp", vidApp);
 
-app.get(["/", "/vidapp", "/*"], (req, res) => res.send("Welcome to VIDAPP!"));
+// app.get(["/", "/vidapp", "/*"], (req, res) => res.send("Welcome to VIDAPP!"));
 
 expressListRouters(app);
 

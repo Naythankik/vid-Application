@@ -1,7 +1,6 @@
 const Rentals = require("../models/rentals");
 const Users = require("../models/users");
 const Movies = require("../models/movies");
-const { rentalValidation } = require("../middleware/validation");
 
 const getRentals = async (req, res) => {
   const rentals = await Rentals.find();
