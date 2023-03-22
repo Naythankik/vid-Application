@@ -110,8 +110,10 @@ const logout = async (req, res) => {
     }
 
     await User.findByIdAndUpdate(user.id, {
-      token: "",
-      isActive: false,
+      $set: {
+        token: "",
+        isActive: false,
+      },
     });
     res.clearCookie("token", { httpOnly: true, secure: true });
     res.status(200).send({ message: "User has been logout successfully" });

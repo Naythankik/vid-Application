@@ -27,14 +27,4 @@ const movieValidation = (param) => {
   return movie.validate(param.body);
 };
 
-const rentalValidation = (param) => {
-  const schema = Joi.object({
-    userId: Joi.string().required(),
-    price: Joi.number().required(),
-    movieUuid: Joi.string().required(),
-  });
-
-  return schema.validate(param);
-};
-
-module.exports = { userValidation, movieValidation, rentalValidation };
+module.exports = { userValidation, movieValidation };

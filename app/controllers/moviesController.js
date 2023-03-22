@@ -22,6 +22,11 @@ const getMovies = async (req, res) => {
 
   //select by genre
   if (req.query.genre) {
+    // check if the query contains more than one string
+    if (req.query.genre.includes(",")) {
+      const string = req.query.genre.split(",");
+      req.query.genre = string;
+    }
     query.genre = { $in: req.query.genre };
   }
 

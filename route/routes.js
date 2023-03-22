@@ -21,10 +21,7 @@ const {
   deleteRent,
 } = require("../app/controllers/moviesController");
 
-const {
-  getRentals,
-  postRental,
-} = require("../app/controllers/rentalsController");
+const { getRentals } = require("../app/controllers/rentalsController");
 
 const { getGenres, postGenre } = require("../app/controllers/genresController");
 
@@ -52,7 +49,8 @@ routers
   .route("/user/movies")
   .get(getMovies)
   .post(authorization, postMovies);
-routers.route("/user/rentals").get(getRentals).post(postRental);
+
+routers.route("/user/rentals").get(authentication, authorization, getRentals);
 
 routers
   .route("/user/:id")
