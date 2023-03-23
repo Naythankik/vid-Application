@@ -1,5 +1,4 @@
 const express = require("express");
-const expressListRouters = require("express-list-routes");
 require("dotenv").config();
 const PORT = process.env.PORT || 2000;
 const vidApp = require("./route/routes");
@@ -18,9 +17,7 @@ app.use(cookieParser());
 
 app.use("/api/vidapp", vidApp);
 
-// app.get(["/", "/vidapp", "/*"], (req, res) => res.send("Welcome to VIDAPP!"));
-
-expressListRouters(app);
+app.get(["/", "/vidapp", "/*"], (req, res) => res.send("Welcome to VIDAPP!"));
 
 app.listen(PORT, () => {
   console.log(`The app is running on port ${PORT}`);

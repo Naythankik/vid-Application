@@ -1,9 +1,9 @@
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { userValidation } = require("../middleware/validation");
 const generateToken = require("../middleware/token");
 const mail = require("./emailController");
+const crypto = require("crypto");
 
 //For admin alone
 const getUsers = async (req, res) => {
@@ -18,6 +18,8 @@ const getUsers = async (req, res) => {
 
 const createUser = async (req, res) => {
   let { error, value } = userValidation(req.body);
+
+  //   Mailing data
   const data = {
     to: value.email,
     text: `Account has been created successfully`,
@@ -31,24 +33,13 @@ const createUser = async (req, res) => {
   } else {
     try {
       const user = await User.create(value);
-      const token = jwt.sign(
-        { user: user.uuid, email: user.email },
-        process.env.TOKEN_KEY,
-        {
-          expiresIn: "2h",
-        }
-      );
-      const createdUser = await User.findOneAndUpdate(
-        { uuid: user.uuid },
-        { token: token }
-      );
-      if (createdUser) {
-        mail(data);
-      }
+
+      if (user) mail(data);
+
       res
         .status(201)
         .send(
-          "The user has been created successfully! \n check your mail inbox for Account verification"
+          "The user has been created successfully!!! \n check your mail inbox for Account verification"
         );
     } catch (err) {
       throw new Error(err);
@@ -92,6 +83,77 @@ const login = async (req, res) => {
     throw new Error(err);
   }
   return;
+};
+
+const forgetPassword = async (req, res) => {
+  const { email } = req.body;
+  const findUser = await User.findOne({ email });
+
+  if (!findUser) throw new Error("Email not found");
+
+  //set a token to reset the password
+  try {
+    const token = crypto.randomBytes(32).toString("hex");
+    findUser.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+    findUser.passwordExpires = Date.now() + 30 * 60 * 1000;
+
+    await findUser.save();
+
+    const data = {
+      to: email,
+      text: `Click the link to reset password`,
+      subject: "Password Reset",
+      html: `<a href="localhost:5000/api/vidapp/resetPassword/${token}">RESET PASSWORD</a>`,
+    };
+    mail(data);
+    res
+      .status(200)
+      .send({ message: "A reset password link has been sent to your email" });
+    return;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+
+  //check if the password is given
+  if (!password) throw new Error("password is empty");
+
+  const hashToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  try {
+    const findUser = await User.findOne({
+      passwordResetToken: hashToken,
+      passwordExpires: { $gte: Date.now() },
+    });
+
+    //if findUser returns null
+    if (!findUser) throw new Error("Reset token has expired, try again");
+
+    findUser.password = password;
+    findUser.passwordExpires = undefined;
+    findUser.passwordResetToken = undefined;
+    await findUser.save();
+
+    mail({
+      to: findUser.email,
+      subject: "Password Reset Successfully",
+      text: "Password has been reset succcesfully",
+      html: `<a href="localhost:5000/api/vidapp/login>Login</a>`,
+    });
+
+    res.status(201).send({ message: "Password has been reset successfully" });
+  } catch (error) {
+    throw new Error(error);
+  }
+
+  //   check if the token exist
 };
 
 const logout = async (req, res) => {
@@ -173,4 +235,6 @@ module.exports = {
   deleteUser,
   login,
   logout,
+  forgetPassword,
+  resetPassword,
 };

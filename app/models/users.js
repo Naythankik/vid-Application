@@ -44,6 +44,8 @@ const user = new mongoose.Schema(
     password: {
       type: String,
     },
+    passwordResetToken: String,
+    passwordExpires: Date,
   },
   { timestamps: true }
 );
@@ -51,6 +53,7 @@ const user = new mongoose.Schema(
 user.pre("save", async function (next) {
   const salt = await bcrypt.genSaltSync(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 module.exports = mongoose.model("User", user);

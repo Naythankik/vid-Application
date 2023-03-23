@@ -8,6 +8,8 @@ const {
   deleteUser,
   logout,
   createUser,
+  forgetPassword,
+  resetPassword,
 } = require("../app/controllers/usersController");
 
 const {
@@ -33,6 +35,9 @@ const {
 const routers = express.Router();
 
 routers.post("/login", login).post("/logout", logout);
+
+routers.post("/forget-password", forgetPassword);
+routers.post("/resetPassword/:token", resetPassword);
 
 routers
   .route("/users")
