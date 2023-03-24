@@ -34,7 +34,7 @@ const {
 
 const routers = express.Router();
 
-routers.post("/login", login).post("/logout", logout);
+routers.post("/login", login).get("/logout", logout);
 
 routers.post("/forget-password", forgetPassword);
 routers.post("/resetPassword/:token", resetPassword);
